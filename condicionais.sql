@@ -100,5 +100,35 @@ END;
 
 SELECT * FROM ALUNO;
 
-// Exercício
+// Exercício 3
+// 6, 12, 18
+DECLARE
+
+    VALOR_PRODUTO NUMBER := &valor;
+    PORC_ENTRADA NUMBER;
+    QTD_PARCELAS NUMBER := &parcela;
+    VALOR_PARCELA NUMBER;
+
+BEGIN
+
+    PORC_ENTRADA := VALOR_PRODUTO * 0.2;
+    dbms_output.put_line('valor de entrada: R$ ' || PORC_ENTRADA);
+    
+    IF QTD_PARCELAS = 6 THEN
+        VALOR_PARCELA := ((VALOR_PRODUTO - PORC_ENTRADA) * 1.1) / 6;
+        dbms_output.put_line('Valor da parcela em 6x é: R$ ' || VALOR_PARCELA);
+    
+    ELSIF QTD_PARCELAS = 12 THEN
+        VALOR_PARCELA := ((VALOR_PRODUTO - PORC_ENTRADA) * 1.15) / 12;
+        dbms_output.put_line('Valor da parcela em 12x é: R$ ' || VALOR_PARCELA);
+        
+    ELSIF QTD_PARCELAS = 18 THEN
+        VALOR_PARCELA := ((VALOR_PRODUTO - PORC_ENTRADA) * 1.20) / 18;
+        dbms_output.put_line('Valor da parcela em 18x é: R$ ' || VALOR_PARCELA);
+        
+    ELSE 
+        dbms_output.put_line('Número de parcela indisponível!!!');
+
+    END IF;
+END;
 
