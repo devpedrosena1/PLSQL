@@ -23,6 +23,26 @@ BEGIN
     END LOOP;
 END;
 
+// OUTRA FORMA DE FAZER 
+
+DECLARE
+    v_cod_produto NUMBER := &cod;
+    v_total NUMBER;
+BEGIN
+    SELECT NVL(SUM(qtd_movimentacao_estoque), 0)
+    INTO v_total
+    FROM movimento_estoque
+    WHERE cod_produto = v_cod_produto;
+
+    IF v_total = 0 THEN
+        dbms_output.put_line('Produto ' || v_cod_produto || ' não possui movimentações.');
+    ELSE
+        dbms_output.put_line('Total de movimentações do produto ' || v_cod_produto || ' = ' || v_total);
+    END IF;
+END;
+
+// -------------------------------------------------------------
+
 // 2.	Utilizando FOR crie um bloco anônimo que calcula a média de valores 
 // totais de pedidos para um cliente específico.
 
@@ -45,9 +65,31 @@ BEGIN
     END LOOP;
 END;
 
+// OUTRA FORMA DE FAZER
+DECLARE
+    v_cod_cliente NUMBER := &cod;
+    v_media NUMBER;
+BEGIN
+    SELECT ROUND(AVG(val_total_pedido), 2)
+    INTO v_media
+    FROM pedido
+    WHERE cod_cliente = v_cod_cliente;
+
+    IF v_media IS NULL THEN
+        dbms_output.put_line('Cliente ' || v_cod_cliente || ' não possui pedidos.');
+    ELSE
+        dbms_output.put_line('Média de valores do cliente ' || v_cod_cliente || ' = ' || v_media);
+    END IF;
+END;
+
+
+// -------------------------------------------------------------
+
 // 3.	Crie um bloco anônimo que exiba os produtos compostos ativos
 SELECT * FROM PRODUTO_COMPOSTO;
 
+DECLARE
+    v_count NUMBER := 0;
 BEGIN
     FOR x IN (
         SELECT
@@ -57,9 +99,13 @@ BEGIN
         WHERE
             sta_ativo = 'S'
     ) LOOP
+        v_count := v_count + 1;
         dbms_output.put_line('Produtos compostos ativos: ' || x.cod_produto);
     END LOOP;
+    dbms_output.put_line('Total de produtos ativos = ' || v_count);
 END;
+
+// -------------------------------------------------------------
 
 // 4.	Crie um bloco anônimo para calcular o total de movimentações de estoque
 // para um determinado produto usando INNER JOIN com a tabela de 
@@ -87,6 +133,23 @@ BEGIN
     END LOOP;
 END;
 
+// OUTRA FORMA DE FAZER
+DECLARE
+    v_cod_produto NUMBER := &cod;
+    v_total NUMBER;
+BEGIN
+    SELECT NVL(SUM(m.qtd_movimentacao_estoque),0)
+    INTO v_total
+    FROM movimento_estoque m
+         INNER JOIN tipo_movimento_estoque t 
+         ON m.cod_tipo_movimento_estoque = t.cod_tipo_movimento_estoque
+    WHERE m.cod_produto = v_cod_produto;
+
+    dbms_output.put_line('Total de movimentações do produto ' || v_cod_produto || ' = ' || v_total);
+END;
+
+// -------------------------------------------------------------
+
 // 5.	Crie um bloco anônimo para exibir os produtos compostos e, se houver, 
 // suas informações de estoque, usando LEFT JOIN com a tabela estoque_produto.
 
@@ -109,51 +172,32 @@ BEGIN
     END LOOP;
 END;
 
+
+
 // 6.	Crie um bloco que exiba as informações de pedidos e, se houver, 
 // as informações dos clientes relacionados usando RIGHT JOIN com a tabela cliente.
-
+SELECT * FROM PEDIDO;
+SELECT * FROM CLIENTE; // COD CLIENTE
 BEGIN
     FOR x IN (
         SELECT
-            c.nome_cliente,
-            p.id_pedido,
-            p.valor_pedido
+            c.cod_cliente,
+            p.cod_pedido,
+            p.val_total_pedido
         FROM
-            cliente c
-            RIGHT JOIN pedidos p ON c.id_cliente = p.id_cliente
+            pedido p
+            RIGHT JOIN cliente c ON c.cod_cliente = p.cod_cliente
     ) LOOP
         dbms_output.put_line('Cliente: '
-                             || nvl(x.nome_cliente, 'Sem cliente')
+                             || x.cod_cliente
                              || ' | Pedido: '
-                             || x.id_pedido
+                             || x.cod_pedido
                              || ' | Valor: '
-                             || x.valor_pedido);
+                             || x.val_total_pedido);
     END LOOP;
 END;
 
 
-// 7.	Crie um bloco que calcule a média de valores totais de pedidos para um 
-// cliente específico e exibe as informações do cliente usando INNER JOIN 
-// com a tabela cliente.
-
-BEGIN
-    FOR x IN (
-        SELECT
-            c.nome_cliente,
-            AVG(p.valor_pedido) AS media
-        FROM
-                 cliente c
-            INNER JOIN pedidos p ON c.id_cliente = p.id_cliente
-        WHERE
-            c.id_cliente = 1
-        GROUP BY
-            c.nome_cliente
-    ) LOOP
-        dbms_output.put_line('Cliente: '
-                             || x.nome_cliente
-                             || ' | Média dos pedidos = '
-                             || nvl(x.media, 0));
-    END LOOP;
-END;
+ 
 
 
