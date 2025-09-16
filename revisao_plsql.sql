@@ -137,3 +137,64 @@ BEGIN
     END LOOP;
 END;
 
+/*
+
+🔹 Exercício 5 – Função simples
+
+Crie uma função chamada fn_total_pedidos_cliente(p_cod_cliente IN NUMBER) que:
+
+Receba como parâmetro o código do cliente,
+
+Retorne a quantidade de pedidos feitos por ele (RETURN NUMBER).
+
+Teste a função chamando-a dentro de um bloco anônimo e exibindo o resultado.
+
+*/
+
+CREATE OR REPLACE FUNCTION fn_total_pedidos (
+    p_cod_cliente NUMBER
+) RETURN NUMBER IS 
+    p_qtd_pedido NUMBER;
+
+BEGIN
+
+    select count(p.cod_pedido)
+    into p_qtd_pedido
+    from pedido p join cliente c
+    on p.cod_cliente = c.cod_cliente
+    where p.cod_cliente = p_cod_cliente;
+    
+    return p_qtd_pedido;
+
+END;
+
+select fn_total_pedidos(74) from dual;
+
+/*
+Exercício 6 – Função mais elaborada (combina tudo)
+
+Crie uma função chamada fn_classifica_cliente(p_cod_cliente IN NUMBER) que:
+
+Retorne uma classificação textual do cliente:
+
+"Sem pedidos" se não tiver nenhum.
+
+"Iniciante" se tiver até 5 pedidos.
+
+"Recorrente" se tiver mais de 5 pedidos e gasto total até 10.000.
+
+"Premium" se o gasto total for maior que 10.000.
+
+Essa função deve usar:
+
+Declaração de variáveis,
+
+SELECT INTO para buscar os dados,
+
+Condicional IF,
+
+E retornar a string.
+*/
+
+
+
