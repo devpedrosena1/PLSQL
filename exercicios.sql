@@ -41,3 +41,5 @@ end;
 SELECT FN_TOTAL_PED_CIDADE('Fortaleza') FROM DUAL;
 
 // ve se estuda seu merda
+
+regexp_like (atribuo, ['0-9']);
