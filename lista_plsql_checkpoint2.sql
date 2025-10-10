@@ -283,5 +283,30 @@ exception
         raise_application_error(-20001, 'Muitos produtos.');
 end;
 
+// -------------------------------------------------------------
+declare
+    exc_valor_alto exception;
+begin
+    for x in (
+        select c.nom_cliente, count(p.cod_pedido) as total_pedidos, sum(p.val_total_pedido) as valor_total
+        from cliente c join pedido p on c.cod_cliente = p.cod_cliente
+        group by c.nom_cliente
+        order by valor_total desc
+    ) loop 
+        begin
+        if x.valor_total > 10000 then
+            raise exc_valor_alto;
+        else 
+            dbms_output.put_line('Nome do cliente: ' || x.nom_cliente || 'Total pedidos: ' || x.total_pedidos ||' - Total Valor R$' || x.valor_total);
+        end if;
+        
+        exception 
+            when exc_valor_alto then
+                dbms_output.put_line('Cliente: ' || x.nom_cliente || ' ultrapassou o limite de R$10.000');
+            when no_data_found then
+                raise_application_error(-20002, 'Cliente não existe.');
+        end;
+    end loop;
+end;
 
         
